@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Tugas.Models;
+using Tugas.ViewModels;
 using Tugas.Repository.Interface;
 
 namespace Tugas.Controllers
@@ -88,7 +89,7 @@ namespace Tugas.Controllers
         }
 
         [HttpPost("Employee")]
-        public ActionResult Insert(Employee employee)
+        public ActionResult Insert(EmployeeVM employee)
         {
             try
             {

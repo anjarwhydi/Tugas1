@@ -7,7 +7,7 @@ namespace Tugas.Repository.Interface
     {
         IEnumerable<Employee> Get();
         Employee Get(string NIK);
-        int Insert(Employee employee);
+        int Insert(EmployeeVM employee);
         int Update(Employee employee);
         int Delete(string NIK);
         List<GetActiveEmpDept> GetActiveEmpDept();

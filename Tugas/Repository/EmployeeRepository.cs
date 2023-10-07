@@ -41,19 +41,29 @@ namespace Tugas.Repository
             return context.Employees.FirstOrDefault(e => e.NIK == NIK);
         }
 
-        public int Insert(Employee employee)
+        public int Insert(EmployeeVM employee)
         {
             if (!IsPhoneUnique(employee.PhoneNumber))
             {
                 throw new ArgumentException("Phone number already exists in the database.");
             }
-            employee.NIK = GenNIK();
             if (!IsEmailUnique(employee.Email))
             {
                 employee.Email = GenEmailForDuplicate(employee.FirstName, employee.LastName);
             }
             employee.Email = GenEmail(employee.FirstName, employee.LastName);
-            context.Employees.Add(employee);
+            var newEmployee = new Employee
+            {
+                NIK = GenNIK(),
+                FirstName = employee.FirstName,
+                LastName = employee.LastName,
+                Email = employee.Email,
+                PhoneNumber = employee.PhoneNumber,
+                Address = employee.Address,
+                IsActive = employee.IsActive,
+                Department_ID = employee.Department_ID
+            };
+            context.Employees.Add(newEmployee);
             return context.SaveChanges();
         }
 
@@ -171,20 +181,14 @@ namespace Tugas.Repository
             return result;
         }
 
-        //public List<TotalActiveEmp> TotalActiveEmps()
-        //{
-        //    var result = (from e in context.Employees
-        //                  join d in context.Departments on e.Department_ID equals d.DeptID
-        //                  where e.IsActive == true
-        //                  select new {}
-        //                  select new TotalActiveEmp
-        //                  {
-        //                      total = e.FirstName + " " + e.LastName,
-        //                      Email = e.Email,
-        //                      PhoneNumber = e.PhoneNumber,
-        //                      Address = e.Address,
-        //                  }).ToList();
-        //    return result;
-        //}
+        public List<TotalActiveEmp> TotalActiveEmps()
+        {
+            var result = context.Employees.Where(e => e.IsActive == true).GroupBy(e => e.Department.Name).Select(g => new TotalActiveEmp
+            {
+                department = g.Key,
+                total = g.Count()
+            }).ToList();
+            return result;
+        }
     }
 }

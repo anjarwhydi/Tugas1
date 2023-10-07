@@ -2,6 +2,7 @@
 using Tugas.Models;
 using Tugas.Repository.Interface;
 using Tugas.Context;
+using Tugas.ViewModels;
 
 namespace Tugas.Repository
 {
@@ -25,25 +26,42 @@ namespace Tugas.Repository
             return context.SaveChanges();
         }
 
-        public IEnumerable<Department> Get()
+        public IEnumerable<DepartmentVM> Get()
         {
-            return context.Departments.ToList();
+            var result = (from d in context.Departments
+                          select new DepartmentVM
+                          {
+                              DeptID = d.DeptID,
+                              Name = d.Name
+                          }).ToList();
+            return result;
         }
 
-        public Department Get(string ID)
+        public DepartmentVM Get(string ID)
         {
-            return context.Departments.FirstOrDefault(d => d.DeptID == ID);
+            var result = (from d in context.Departments
+                          where d.DeptID == ID
+                          select new DepartmentVM
+                          {
+                              DeptID = d.DeptID,
+                              Name = d.Name
+                          }).FirstOrDefault();
+            return result;
         }
 
-        public int Insert(Department department)
+        public int Insert(DepartmentVM department)
         {
-            context.Departments.Add(department);
-            department.DeptID = GenDeptID();
+            var newDepartment = new Department
+            {
+                DeptID = GenDeptID(),
+                Name = department.Name
+            };
+            context.Departments.Add(newDepartment);
             var results = context.SaveChanges();
             return results;
         }
 
-        public int Update(Department department)
+        public int Update(DepartmentVM department)
         {
             var existingDepartment = context.Departments.FirstOrDefault(e => e.DeptID == department.DeptID);
             if (existingDepartment == null)
@@ -52,16 +70,14 @@ namespace Tugas.Repository
             }
 
             existingDepartment.Name = department.Name;
-
-            context.Entry(existingDepartment).State = EntityState.Modified;
             return context.SaveChanges();
         }
 
         public string GenDeptID()
         {
-            int existingCount = context.Departments.Count(d => d.DeptID.StartsWith("D"));
+            int existingCount = context.Departments.Count();
 
-            string newID = $"{existingCount + 1:D3}";
+            string newID = $"D{existingCount + 1:D3}";
 
             return newID;
         }
