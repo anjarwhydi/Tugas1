@@ -5,7 +5,7 @@ namespace Tugas.Repository.Interface
 {
     public interface IEmployeeRepository
     {
-        IEnumerable<Employee> Get();
+        IEnumerable<EmployeeVM> Get();
         Employee Get(string NIK);
         int Insert(EmployeeVM employee);
         int Update(Employee employee);
@@ -14,6 +14,7 @@ namespace Tugas.Repository.Interface
         List<GetNonActiveEmpDept> GetNonActiveEmpDept();
         List<GetActiveEmpPerDept> GetActiveEmpPerDept(string depart);
         List<GetNonActiveEmpPerDept> GetNonActiveEmpPerDept(string depart);
-
+        List<TotalActiveEmp> TotalActiveEmp();
+        List<TotalActiveEmp> TotalNonActiveEmp();
     }
 }

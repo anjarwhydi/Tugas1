@@ -27,13 +27,27 @@ namespace Tugas.Repository
             {
                 throw new ArgumentException("Data not found.");
             }
-            context.Employees.Remove(employee);
+            employee.IsActive = false;
             return context.SaveChanges();
         }
 
-        public IEnumerable<Employee> Get()
+        public IEnumerable<EmployeeVM> Get()
         {
-            return context.Employees.ToList();
+            var result = (from e in context.Employees
+                          join d in context.Departments on e.Department_ID equals d.DeptID
+                          select new EmployeeVM
+                          {
+                              NIK = e.NIK,
+                              FirstName = e.FirstName,
+                              LastName = e.LastName,
+                              PhoneNumber = e.PhoneNumber,
+                              Email = e.Email,
+                              Address = e.Address,
+                              IsActive = e.IsActive,
+                              DepartID = e.Department_ID
+                          }).ToList();
+
+            return result;
         }
 
         public Employee Get(string NIK)
@@ -61,7 +75,7 @@ namespace Tugas.Repository
                 PhoneNumber = employee.PhoneNumber,
                 Address = employee.Address,
                 IsActive = employee.IsActive,
-                Department_ID = employee.Department_ID
+                Department_ID = employee.DepartID
             };
             context.Employees.Add(newEmployee);
             return context.SaveChanges();
@@ -181,7 +195,17 @@ namespace Tugas.Repository
             return result;
         }
 
-        public List<TotalActiveEmp> TotalActiveEmps()
+        public List<TotalActiveEmp> TotalActiveEmp()
+        {
+            var result = context.Employees.Where(e => e.IsActive == true).GroupBy(e => e.Department.Name).Select(g => new TotalActiveEmp
+            {
+                department = g.Key,
+                total = g.Count()
+            }).ToList();
+            return result;
+        }
+
+        public List<TotalActiveEmp> TotalNonActiveEmp()
         {
             var result = context.Employees.Where(e => e.IsActive == true).GroupBy(e => e.Department.Name).Select(g => new TotalActiveEmp
             {

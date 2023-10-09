@@ -42,7 +42,7 @@ namespace Tugas.Controllers
             return response;
         }
 
-        [HttpGet("Employee")]
+        [HttpGet("Employees")]
         public ActionResult Get()
         {
             try
@@ -181,6 +181,42 @@ namespace Tugas.Controllers
             try
             {
                 var employee = repository.GetNonActiveEmpPerDept(depart);
+                if (employee == null)
+                {
+                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
+                }
+                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
+            }
+            catch (ArgumentException ex)
+            {
+                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
+            }
+        }
+
+        [HttpGet("TotalActiveEmp")]
+        public ActionResult TotalActiveEmp()
+        {
+            try
+            {
+                var employee = repository.TotalActiveEmp();
+                if (employee == null)
+                {
+                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
+                }
+                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
+            }
+            catch (ArgumentException ex)
+            {
+                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
+            }
+        }
+
+        [HttpGet("TotalNonActiveEmp")]
+        public ActionResult TotalNonActiveEmp()
+        {
+            try
+            {
+                var employee = repository.TotalNonActiveEmp();
                 if (employee == null)
                 {
                     return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
