@@ -73,13 +73,48 @@ namespace Tugas.Repository
             return context.SaveChanges();
         }
 
+        //public string GenDeptID()
+        //{
+        //    int existingCount = context.Departments.Count();
+
+        //    string newID = $"D{existingCount + 1:D3}";
+
+        //    return newID;
+        //}
+
+        //public string GenDeptID()
+        //{
+        //    int existingCount = context.Departments.Count();
+        //    int newID;
+
+        //    if (existingCount == 0)
+        //    {
+        //        newID = 1;
+        //    }
+        //    else
+        //    {
+        //        string maxID = context.Departments.Max(d => d.DeptID);
+        //        newID = int.Parse(maxID.Substring(1)) + 1;
+        //    }
+
+        //    return $"D{newID:D3}";
+        //}
+
         public string GenDeptID()
         {
-            int existingCount = context.Departments.Count();
+            var existingIDs = context.Departments.Select(d => d.DeptID).ToList();
 
-            string newID = $"D{existingCount + 1:D3}";
+            for (int i = 1; ; i++)
+            {
+                string newID = $"D{i:D3}";
 
-            return newID;
+                if (!existingIDs.Contains(newID))
+                {
+                    return newID;
+                }
+            }
         }
+
+
     }
 }

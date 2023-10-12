@@ -31,11 +31,11 @@ namespace Tugas.Repository
             return context.SaveChanges();
         }
 
-        public IEnumerable<EmployeeVM> Get()
+        public IEnumerable<GetEmployeeVM> Get()
         {
             var result = (from e in context.Employees
                           join d in context.Departments on e.Department_ID equals d.DeptID
-                          select new EmployeeVM
+                          select new GetEmployeeVM
                           {
                               NIK = e.NIK,
                               FirstName = e.FirstName,
@@ -44,7 +44,7 @@ namespace Tugas.Repository
                               Email = e.Email,
                               Address = e.Address,
                               IsActive = e.IsActive,
-                              DepartID = e.Department_ID
+                              DepartName = d.Name
                           }).ToList();
 
             return result;
@@ -74,7 +74,7 @@ namespace Tugas.Repository
                 Email = employee.Email,
                 PhoneNumber = employee.PhoneNumber,
                 Address = employee.Address,
-                IsActive = employee.IsActive,
+                IsActive = true,
                 Department_ID = employee.DepartID
             };
             context.Employees.Add(newEmployee);

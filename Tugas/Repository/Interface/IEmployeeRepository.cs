@@ -5,7 +5,7 @@ namespace Tugas.Repository.Interface
 {
     public interface IEmployeeRepository
     {
-        IEnumerable<EmployeeVM> Get();
+        IEnumerable<GetEmployeeVM> Get();
         Employee Get(string NIK);
         int Insert(EmployeeVM employee);
         int Update(Employee employee);

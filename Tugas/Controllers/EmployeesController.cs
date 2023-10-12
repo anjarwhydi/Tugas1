@@ -228,5 +228,11 @@ namespace Tugas.Controllers
                 return CreateResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }
+
+        [HttpGet("TestCors")]
+        public ActionResult TestCors()
+        {
+            return Ok("Test Cors Berhasil");
+        }
     }
 }
