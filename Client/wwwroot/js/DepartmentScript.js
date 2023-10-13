@@ -3,27 +3,16 @@ $('#editModal').on('shown.bs.modal', function () {
     $('#editDepartmentName').trigger('focus')
 });
 
-//$('#editModal').on('show.bs.modal', function (event) {
-//    var button = $(event.relatedTarget);
-//    var modal = $(this);
-
-//    // Reset modal content
-//    modal.find("#Id").val("");
-//    modal.find("#DepartmentName").val("");
-
-//    // Determine if this is an "Edit" operation or "Add" operation
-//    if (button.data('operation') === 'edit') {
-//        modal.find(".modal-title").text("Edit Department");
-//        modal.find("#add-data").hide();
-//        modal.find("#update-data").show();
-//    } else {
-//        modal.find(".modal-title").text("Add New Department");
-//        modal.find("#add-data").show();
-//        modal.find("#update-data").hide();
-//    }
-//});
 
 $(document).ready(function () {
+
+    var currentUrl = window.location.href;
+    $('.nav-treeview a').each(function () {
+        if (currentUrl.indexOf($(this).attr('href')) > -1) {
+            $(this).addClass('active');
+        }
+    });
+
     var table = $('#datatable').DataTable({
 
         "paging": true,
@@ -56,8 +45,8 @@ $(document).ready(function () {
                 "data": null,
                 "orderable": false,
                 "render": function (data, type, row) {
-                    return '<button type="button" class="btn btn-warning btn-sm edit-button" data-operation="edit" data-target="#Modal" data-toggle="modal" data-tooltip="tooltip" data-placement="left" onclick="clearUpdate();return GetById(\'' +row.deptID + '\');" title="Edit"><i class="fas fa-edit"></i></button>' + ' ' +
-                        '<button type="button" class="btn btn-danger btn-sm remove-button" data-tooltip="tooltip" data-placement="right" onclick="return Delete(\'' + row.deptID + '\')" title="Delete"><i class="fas fa-trash"></i></button>'
+                    return '<button type="button" class="btn btn-warning btn-sm edit-button" data-operation="edit" data-target="#Modal" data-toggle="modal" data-tooltip="tooltip" data-placement="left" onclick="GetById(\'' +row.deptID + '\');" title="Edit"><i class="fas fa-edit"></i></button>' + ' ' +
+                        '<button type="button" class="btn btn-danger btn-sm remove-button" data-tooltip="tooltip" data-placement="right" onclick="Delete(\'' + row.deptID + '\')" title="Delete"><i class="fas fa-trash"></i></button>'
                 }
             }
         ]
@@ -71,18 +60,13 @@ $(document).ready(function () {
 })
 
 function clearSave() {
-    /*$('#input-id').hide();*/
+    $('#input-id').hide();
+    $("#departError").text("");
     $('#DepartmentName').val('');
     $('#save-button').show();
     $('#update-button').hide();
 }
 
-function clearUpdate() {
-    $('#DepartmentName').val('');
-    /*$('#input-id').hide();*/
-    $('#save-button').hide();
-    $('#update-button').show();
-}
 
 //function Save() {
 //    var Department = new Object();
@@ -175,13 +159,15 @@ function clearUpdate() {
 
 function Save() {
     var departmentName = $("#DepartmentName").val();
+    $("#departError").text("");
     if (!departmentName) {
+        $("#departError").text("Department name is required");
         Swal.fire({
             title: 'Validation Error',
             text: 'Please enter a department name',
             icon: 'error'
         });
-        return; // Jangan lanjutkan jika validasi gagal.
+        return;
     }
 
     var Department = new Object();
@@ -217,7 +203,9 @@ function Save() {
 
 function Update() {
     var departmentName = $("#DepartmentName").val();
+    $("#departError").text("");
     if (!departmentName) {
+        $("#departError").text("Department name is required");
         Swal.fire({
             title: 'Validation Error',
             text: 'Please enter a department name',
@@ -302,8 +290,12 @@ function GetById(deptID) {
         dataType: 'json',
         success: function (result) {
             var obj = result.data;
+            $("#departError").text("");
+            $('#input-id').show();
+            $('#save-button').hide();
+            $('#update-button').show();
             $('#Id').val(obj.deptID);
-            $('#DepartmentName').val(obj.Name);
+            $('#DepartmentName').val(obj.name);
         }
     })
 }

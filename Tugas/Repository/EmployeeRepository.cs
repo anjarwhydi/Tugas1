@@ -61,17 +61,12 @@ namespace Tugas.Repository
             {
                 throw new ArgumentException("Phone number already exists in the database.");
             }
-            if (!IsEmailUnique(employee.Email))
-            {
-                employee.Email = GenEmailForDuplicate(employee.FirstName, employee.LastName);
-            }
-            employee.Email = GenEmail(employee.FirstName, employee.LastName);
             var newEmployee = new Employee
             {
                 NIK = GenNIK(),
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
-                Email = employee.Email,
+                Email = GeneratedEmail(employee.FirstName, employee.LastName),
                 PhoneNumber = employee.PhoneNumber,
                 Address = employee.Address,
                 IsActive = true,
@@ -99,18 +94,18 @@ namespace Tugas.Repository
             return context.SaveChanges();
         }
 
-        public string GenEmail(string First, string Last)
-        {
-            string newNIK = $"{First}.{Last}@berca.co.id";
-            return newNIK;
-        }
+        //public string GenEmail(string First, string Last)
+        //{
+        //    string newNIK = $"{First}.{Last}@berca.co.id";
+        //    return newNIK;
+        //}
 
-        public string GenEmailForDuplicate(string First, string Last)
-        {
-            int existingCount = context.Employees.Count(e => e.Email.StartsWith($"{First}.{Last}"));
-            string newNIK = $"{First}.{Last}{existingCount + 1:D3}@berca.co.id";
-            return newNIK;
-        }
+        //public string GenEmailForDuplicate(string First, string Last)
+        //{
+        //    int existingCount = context.Employees.Count(e => e.Email.StartsWith($"{First}.{Last}"));
+        //    string newNIK = $"{First}.{Last}{existingCount + 1:D3}{"@berca.co.id"}";
+        //    return newNIK;
+        //}
 
         public string GenNIK()
         {
@@ -123,10 +118,32 @@ namespace Tugas.Repository
             return newNIK;
         }
 
-        public bool IsEmailUnique(string email)
+        private string GeneratedEmail(string FirstName, string LastName)
         {
-            return !context.Employees.Any(e => e.Email == email);
+            string baseEmail = $"{FirstName.ToLower()}.{LastName.ToLower()}";
+            string generatedEmail = $"{baseEmail}{"@berca.co.id"}";
+            int counter = 1;
+
+            // Check if the generated username already exists in the database
+            while (context.Employees.Any(u => u.Email == generatedEmail))
+            {
+                generatedEmail = $"{baseEmail}{counter:D3}{"@berca.co.id"}"; // Append a three-digit number
+                counter++;
+
+                // To avoid infinite loops, you can add a maximum number of retries here.
+                if (counter > 999)
+                {
+                    throw new Exception("Unable to generate a unique username.");
+                }
+            }
+
+            return generatedEmail;
         }
+
+        //public bool IsEmailUnique(string email)
+        //{
+        //    return !context.Employees.Any(e => e.Email == email);
+        //}
 
         public bool IsPhoneUnique(string phone)
         {
@@ -140,11 +157,14 @@ namespace Tugas.Repository
                           where e.IsActive == true
                           select new GetActiveEmpDept
                           {
-                              Nama = e.FirstName + " " + e.LastName,
-                              Email = e.Email,
+                              NIK = e.NIK,
+                              FirstName = e.FirstName,
+                              LastName = e.LastName,
                               PhoneNumber = e.PhoneNumber,
+                              Email = e.Email,
                               Address = e.Address,
-                              Department = d.Name
+                              IsActive = e.IsActive,
+                              DepartName = d.Name
                           }).ToList();
             return result;
         }
@@ -156,11 +176,14 @@ namespace Tugas.Repository
                           where e.IsActive == false
                           select new GetNonActiveEmpDept
                           {
-                              Nama = e.FirstName + " " + e.LastName,
-                              Email = e.Email,
+                              NIK = e.NIK,
+                              FirstName = e.FirstName,
+                              LastName = e.LastName,
                               PhoneNumber = e.PhoneNumber,
+                              Email = e.Email,
                               Address = e.Address,
-                              Department = d.Name
+                              IsActive = e.IsActive,
+                              DepartName = d.Name
                           }).ToList();
             return result;
         }

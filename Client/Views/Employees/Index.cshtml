@@ -30,8 +30,17 @@
                     <div class="card">
                         <div class="card-header">
                             <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-success font-weight-bold" data-toggle="modal" data-tooltip="tooltip" data-operation="ad" data-placement="right" title="Add New Department" onclick="clearSave()" data-target="#Modal"><i class="fas fa-plus"></i></button>
-
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-success font-weight-bold" data-toggle="modal" data-tooltip="tooltip" data-operation="ad" data-placement="right" title="Add New Department" onclick="clearSave()" data-target="#Modal"><i class="fas fa-plus"></i></button>
+                                <div class="col-3">
+                                    <select class="custom-select" id="employeeData">
+                                        <option value="master" selected>DATA MASTER</option>
+                                        <option value="active">ACTIVE EMPLOYEES</option>
+                                        <option value="resign">RESIGNED EMPLOYEES</option>
+                                    </select>
+                                </div>
+                            </div>
+                           
                             <!-- Modal -->
                             <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -48,7 +57,7 @@
                                                     <label for="IdInput">NIK</label>
                                                     <input type="text" class="form-control" id="nik" disabled />
                                                 </div>
-                                                <div id="input-nik" class="form-group">
+                                                <div id="input-email" class="form-group">
                                                     <label for="IdInput">Email</label>
                                                     <input type="text" class="form-control" id="email" disabled />
                                                 </div>
@@ -56,27 +65,33 @@
                                                     <div class="form-group col-md-6">
                                                         <label for="inputFirstName">First Name</label>
                                                         <input type="text" class="form-control" id="inputFirstName" placeholder="First Name">
+                                                        <span id="firstNameError" class="text-danger"></span>
                                                     </div>
                                                     <div class="form-group col-md-6">
                                                         <label for="inputLastName">Last Name</label>
                                                         <input type="text" class="form-control" id="inputLastName" placeholder="Last Name">
+                                                        <span id="lastNameError" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="inputPhone">Phone</label>
                                                     <input type="text" class="form-control" id="inputPhone" placeholder="08xxxxxxxxxx">
+                                                    <span id="phoneError" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="inputAddress">Address</label>
                                                     <input type="text" class="form-control" id="inputAddress" placeholder="Jl. Abdul Muis, Kelurahan...">
+                                                    <span id="addressError" class="text-danger"></span>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="inputDepart">Department</label>
                                                     <select id="inputDepart" class="form-control">
-                                                        <option selected>Choose...</option>
+                                                        <option selected disabled>Choose...</option>
                                                     </select>
+                                                    <span id="departmentError" class="text-danger"></span>
                                                 </div>
                                             </form>
+                                            <div id="validationErrors" class="text-danger"></div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" id="save-button" class="btn btn-primary" onclick="Save()"><i class="fas fa-save"></i></button>
@@ -86,6 +101,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                         <!-- /.card-header -->
                         <div class="card-body">
                             <table id="datatable" class="table table-bordered table-striped text-center">
