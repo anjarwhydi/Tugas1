@@ -3,6 +3,9 @@ using Tugas.Models;
 using Tugas.Repository.Interface;
 using Tugas.Context;
 using Tugas.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Tugas.Repository
 {
@@ -20,10 +23,11 @@ namespace Tugas.Repository
             var department = context.Departments.Find(ID);
             if (department == null)
             {
-                throw new ArgumentException("Data not found.");
+                return 0; // Ganti dengan 0 sebagai tanda bahwa data tidak ditemukan
             }
             context.Departments.Remove(department);
-            return context.SaveChanges();
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah dihapus
         }
 
         public IEnumerable<DepartmentVM> Get()
@@ -57,48 +61,22 @@ namespace Tugas.Repository
                 Name = department.Name
             };
             context.Departments.Add(newDepartment);
-            var results = context.SaveChanges();
-            return results;
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah dimasukkan
         }
 
         public int Update(DepartmentVM department)
         {
-            var existingDepartment = context.Departments.FirstOrDefault(e => e.DeptID == department.DeptID);
+            var existingDepartment = context.Departments.FirstOrDefault(d => d.DeptID == department.DeptID);
             if (existingDepartment == null)
             {
-                throw new ArgumentException("Data not found.");
+                return 0; // Ganti dengan 0 sebagai tanda bahwa data tidak ditemukan
             }
 
             existingDepartment.Name = department.Name;
-            return context.SaveChanges();
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah diperbarui
         }
-
-        //public string GenDeptID()
-        //{
-        //    int existingCount = context.Departments.Count();
-
-        //    string newID = $"D{existingCount + 1:D3}";
-
-        //    return newID;
-        //}
-
-        //public string GenDeptID()
-        //{
-        //    int existingCount = context.Departments.Count();
-        //    int newID;
-
-        //    if (existingCount == 0)
-        //    {
-        //        newID = 1;
-        //    }
-        //    else
-        //    {
-        //        string maxID = context.Departments.Max(d => d.DeptID);
-        //        newID = int.Parse(maxID.Substring(1)) + 1;
-        //    }
-
-        //    return $"D{newID:D3}";
-        //}
 
         public string GenDeptID()
         {
@@ -114,7 +92,5 @@ namespace Tugas.Repository
                 }
             }
         }
-
-
     }
 }

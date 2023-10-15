@@ -18,107 +18,65 @@ namespace Tugas.Controllers
             this.repository = repository;
         }
 
-        private ActionResult CreateResponse(HttpStatusCode statusCode, string message, object data = null)
-        {
-            if (data == null)
-            {
-                var responseDataNull = new JsonResult(new
-                {
-                    status_code = (int)statusCode,
-                    message,
-                });
-
-                return responseDataNull;
-
-            }
-
-            var response = new JsonResult(new
-            {
-                status_code = (int)statusCode,
-                message,
-                data
-            });
-
-            return response;
-        }
-
         [HttpGet("Department")]
-        public ActionResult Get()
+        public IActionResult Get()
         {
-            try
+            var departments = repository.Get();
+            if (departments == null)
             {
-                var departments = repository.Get();
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", departments);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = departments.Count() + " Data Ditemukan", data = departments });
         }
 
         [HttpGet("{ID}")]
-        public ActionResult Get(string ID)
+        public IActionResult Get(string ID)
         {
-            try
+            var department = repository.Get(ID);
+            if (department == null)
             {
-                var department = repository.Get(ID);
-                if (department == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", department);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been found!", data = department });
         }
 
         [HttpPut("Department")]
-        public ActionResult Update(DepartmentVM department)
+        public IActionResult Update(DepartmentVM department)
         {
-            try
+            var result = repository.Update(department);
+            if (result == 0)
             {
-                repository.Update(department);
-                return CreateResponse(HttpStatusCode.OK, "Data has been updated!", department);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been updated!", data = department });
         }
 
         [HttpPost("Department")]
-        public ActionResult Insert(DepartmentVM department)
+        public IActionResult Insert(DepartmentVM department)
         {
-            try
+            var result = repository.Insert(department);
+            if (result == 0)
             {
-                repository.Insert(department);
-                return CreateResponse(HttpStatusCode.Created, "Data has been inserted!", department);
+                return StatusCode(409, new { status = HttpStatusCode.Conflict, message = "Failed to insert data." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.Conflict, ex.Message);
-            }
+            return StatusCode(201, new { status = HttpStatusCode.Created, message = "Data has been inserted!", data = department });
         }
 
         [HttpDelete("{ID}")]
-        public ActionResult Delete(string ID)
+        public IActionResult Delete(string ID)
         {
-            try
+            var department = repository.Get(ID);
+            if (department == null)
             {
-                var department = repository.Get(ID);
-                if (department == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                repository.Delete(ID);
-                return CreateResponse(HttpStatusCode.OK, "Data has been deleted!", department);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
+
+            var result = repository.Delete(ID);
+            if (result == 0)
             {
-                return CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return StatusCode(400, new { status = HttpStatusCode.BadRequest, message = "Failed to delete data." });
             }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been deleted!", data = department });
         }
     }
 }

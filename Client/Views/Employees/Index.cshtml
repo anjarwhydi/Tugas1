@@ -3,9 +3,7 @@
     Layout = "~/Views/Shared/DataTableLayout.cshtml";
 }
 
-<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -19,17 +17,15 @@
                     </ol>
                 </div>
             </div>
-        </div><!-- /.container-fluid -->
+        </div>
     </section>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <!-- Button trigger modal -->
                             <div class="d-flex justify-content-between">
                                 <button type="button" class="btn btn-success font-weight-bold" data-toggle="modal" data-tooltip="tooltip" data-operation="ad" data-placement="right" title="Add New Department" onclick="clearSave()" data-target="#Modal"><i class="fas fa-plus"></i></button>
                                 <div class="col-3">
@@ -40,8 +36,7 @@
                                     </select>
                                 </div>
                             </div>
-                           
-                            <!-- Modal -->
+
                             <div class="modal fade" id="Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -57,7 +52,7 @@
                                                     <label for="IdInput">NIK</label>
                                                     <input type="text" class="form-control" id="nik" disabled />
                                                 </div>
-                                                <div id="input-email" class="form-group">
+                                                <div id="input-email" class "form-group">
                                                     <label for="IdInput">Email</label>
                                                     <input type="text" class="form-control" id="email" disabled />
                                                 </div>
@@ -102,8 +97,6 @@
                             </div>
                         </div>
 
-
-                        <!-- /.card-header -->
                         <div class="card-body">
                             <table id="datatable" class="table table-bordered table-striped text-center">
                                 <thead>
@@ -121,26 +114,16 @@
                                 </thead>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
-                <!-- /.col -->
             </div>
-            <!-- /.row -->
         </div>
-        <!-- /.container-fluid -->
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
+
 @section Scripts{
-    <!-- jQuery -->
     <script src="~/adminlte-3.2.0/plugins/jquery/jquery.min.js"></script>
-    @*<script src="~/adminlte-3.2.0/docs/assets/plugins/jquery/jquery.min.js"></script>*@
-    <!-- Bootstrap 4 -->
     <script src="~/adminlte-3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables  & Plugins -->
     <script src="~/adminlte-3.2.0/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/adminlte-3.2.0/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/adminlte-3.2.0/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -154,46 +137,13 @@
     <script src="~/adminlte-3.2.0/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <script src="~/adminlte-3.2.0/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- AdminLTE App -->
     <script src="~/adminlte-3.2.0/dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    @*<script src="~/adminlte-3.2.0/dist/js/demo.js"></script>*@
-    <!-- Page specific script -->
     <script src="~/js/employeescript.js"></script>
-    @*    <script>
-        $(function () {
-            $('#datatable').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
-                "ajax": {
-                    url: "https://localhost:7140/api/Departments/Department",
-                    type: "GET",
-                    "datatype": "json",
-                    "dataSrc": "data"
-                },
-                "columns": [
-                    { "data": "no" },
-                    { "data": "deptID" },
-                    { "data": "name" },
-                    { "data": "" }
-                ]
-            }).buttons().container().appendTo('#datatable_wrapper .col-md-6:eq(0)');
-        });
-    </script>*@
     <script>
         $(function () {
             $('[data-tooltip="tooltip"]').tooltip({
                 trigger: 'hover'
             });
-                //$('#input-nik').hide();
         })
     </script>
 }
-

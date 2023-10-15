@@ -4,6 +4,7 @@ using System.Net;
 using Tugas.Models;
 using Tugas.ViewModels;
 using Tugas.Repository.Interface;
+using System;
 
 namespace Tugas.Controllers
 {
@@ -18,221 +19,66 @@ namespace Tugas.Controllers
             this.repository = repository;
         }
 
-        private ActionResult CreateResponse(HttpStatusCode statusCode, string message, object data = null)
-        {
-            if (data == null)
-            {
-                var responseDataNull = new JsonResult(new
-                {
-                    status_code = (int)statusCode,
-                    message,
-                });
-
-                return responseDataNull;
-
-            }
-
-            var response = new JsonResult(new
-            {
-                status_code = (int)statusCode,
-                message,
-                data
-            });
-
-            return response;
-        }
-
         [HttpGet("Employees")]
-        public ActionResult Get()
+        public IActionResult Get()
         {
-            try
+            var employees = repository.Get();
+            if (employees == null)
             {
-                var employees = repository.Get();
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employees);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = employees.Count() + " Data Ditemukan", data = employees });
         }
 
         [HttpGet("{NIK}")]
-        public ActionResult Get(string NIK)
+        public IActionResult Get(string NIK)
         {
-            try
+            var employee = repository.Get(NIK);
+            if (employee == null)
             {
-                var employee = repository.Get(NIK);
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been found!", data = employee });
         }
 
         [HttpPut("Employee")]
-        public ActionResult Update(Employee employee)
+        public IActionResult Update(Employee employee)
         {
-            try
+            var result = repository.Update(employee);
+            if (result == 0)
             {
-                repository.Update(employee);
-                return CreateResponse(HttpStatusCode.OK, "Data has been updated!", employee);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been updated!", data = employee });
         }
 
         [HttpPost("Employee")]
-        public ActionResult Insert(EmployeeVM employee)
+        public IActionResult Insert(EmployeeVM employee)
         {
-            try
+            var result = repository.Insert(employee);
+            if (result == 0)
             {
-                repository.Insert(employee);
-                return CreateResponse(HttpStatusCode.Created, "Data has been inserted!", employee);
+                return StatusCode(409, new { status = HttpStatusCode.Conflict, message = "Phone number already exists in the database." });
             }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.Conflict, ex.Message);
-            }
+            return StatusCode(201, new { status = HttpStatusCode.Created, message = "Data has been inserted!", data = employee });
         }
 
         [HttpDelete("{NIK}")]
-        public ActionResult Delete(string NIK)
+        public IActionResult Delete(string NIK)
         {
-            try
+            var employee = repository.Get(NIK);
+            if (employee == null)
             {
-                var employee = repository.Get(NIK);
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                repository.Delete(NIK);
-                return CreateResponse(HttpStatusCode.OK, "Data has been deleted!", employee);
+                return StatusCode(400, new { status = HttpStatusCode.NotFound, message = "Data not found." });
             }
-            catch (ArgumentException ex)
+
+            var result = repository.Delete(NIK);
+            if (result == 0)
             {
-                return CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return StatusCode(400, new { status = HttpStatusCode.BadRequest, message = "Failed to delete data." });
             }
+            return StatusCode(200, new { status = HttpStatusCode.OK, message = "Data has been deleted!", data = employee });
         }
 
-        [HttpGet("GetActiveEmpDept")]
-        public ActionResult GetActiveEmpDept()
-        {
-            try
-            {
-                var employee = repository.GetActiveEmpDept();
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("GetNonActiveEmpDept")]
-        public ActionResult GetNonActiveEmpDept()
-        {
-            try
-            {
-                var employee = repository.GetNonActiveEmpDept();
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("GetActiveEmpPerDept")]
-        public ActionResult GetActiveEmpPerDept(string depart)
-        {
-            try
-            {
-                var employee = repository.GetActiveEmpPerDept(depart);
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("GetNonActiveEmpPerDept")]
-        public ActionResult GetNonActiveEmpPerDept(string depart)
-        {
-            try
-            {
-                var employee = repository.GetNonActiveEmpPerDept(depart);
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("TotalActiveEmp")]
-        public ActionResult TotalActiveEmp()
-        {
-            try
-            {
-                var employee = repository.TotalActiveEmp();
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("TotalNonActiveEmp")]
-        public ActionResult TotalNonActiveEmp()
-        {
-            try
-            {
-                var employee = repository.TotalNonActiveEmp();
-                if (employee == null)
-                {
-                    return CreateResponse(HttpStatusCode.NotFound, "Data not found.");
-                }
-                return CreateResponse(HttpStatusCode.OK, "Data has been found!", employee);
-            }
-            catch (ArgumentException ex)
-            {
-                return CreateResponse(HttpStatusCode.NotFound, ex.Message);
-            }
-        }
-
-        [HttpGet("TestCors")]
-        public ActionResult TestCors()
-        {
-            return Ok("Test Cors Berhasil");
-        }
     }
 }

@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tugas.Context;
-using System.Globalization;
-using Microsoft.Win32;
 using Tugas.ViewModels;
 
 namespace Tugas.Repository
@@ -25,10 +23,11 @@ namespace Tugas.Repository
             var employee = context.Employees.Find(NIK);
             if (employee == null)
             {
-                throw new ArgumentException("Data not found.");
+                return 0; // Ganti dengan 0 sebagai tanda bahwa data tidak ditemukan
             }
             employee.IsActive = false;
-            return context.SaveChanges();
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah dihapus
         }
 
         public IEnumerable<GetEmployeeVM> Get()
@@ -59,7 +58,7 @@ namespace Tugas.Repository
         {
             if (!IsPhoneUnique(employee.PhoneNumber))
             {
-                throw new ArgumentException("Phone number already exists in the database.");
+                return 0; // Ganti dengan 0 sebagai tanda bahwa nomor telepon sudah ada
             }
             var newEmployee = new Employee
             {
@@ -73,7 +72,8 @@ namespace Tugas.Repository
                 Department_ID = employee.DepartID
             };
             context.Employees.Add(newEmployee);
-            return context.SaveChanges();
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah dimasukkan
         }
 
         public int Update(Employee employee)
@@ -81,7 +81,7 @@ namespace Tugas.Repository
             var existingEmployee = context.Employees.FirstOrDefault(e => e.NIK == employee.NIK);
             if (existingEmployee == null)
             {
-                throw new ArgumentException("Data not found.");
+                return 0; // Ganti dengan 0 sebagai tanda bahwa data tidak ditemukan
             }
 
             existingEmployee.FirstName = employee.FirstName;
@@ -91,21 +91,9 @@ namespace Tugas.Repository
             existingEmployee.Department_ID = employee.Department_ID;
 
             context.Entry(existingEmployee).State = EntityState.Modified;
-            return context.SaveChanges();
+            context.SaveChanges();
+            return 1; // Ganti dengan 1 sebagai tanda bahwa data telah diperbarui
         }
-
-        //public string GenEmail(string First, string Last)
-        //{
-        //    string newNIK = $"{First}.{Last}@berca.co.id";
-        //    return newNIK;
-        //}
-
-        //public string GenEmailForDuplicate(string First, string Last)
-        //{
-        //    int existingCount = context.Employees.Count(e => e.Email.StartsWith($"{First}.{Last}"));
-        //    string newNIK = $"{First}.{Last}{existingCount + 1:D3}{"@berca.co.id"}";
-        //    return newNIK;
-        //}
 
         public string GenNIK()
         {
@@ -124,13 +112,11 @@ namespace Tugas.Repository
             string generatedEmail = $"{baseEmail}{"@berca.co.id"}";
             int counter = 1;
 
-            // Check if the generated username already exists in the database
             while (context.Employees.Any(u => u.Email == generatedEmail))
             {
-                generatedEmail = $"{baseEmail}{counter:D3}{"@berca.co.id"}"; // Append a three-digit number
+                generatedEmail = $"{baseEmail}{counter:D3}{"@berca.co.id"}";
                 counter++;
 
-                // To avoid infinite loops, you can add a maximum number of retries here.
                 if (counter > 999)
                 {
                     throw new Exception("Unable to generate a unique username.");
@@ -140,16 +126,11 @@ namespace Tugas.Repository
             return generatedEmail;
         }
 
-        //public bool IsEmailUnique(string email)
-        //{
-        //    return !context.Employees.Any(e => e.Email == email);
-        //}
-
         public bool IsPhoneUnique(string phone)
         {
             return !context.Employees.Any(e => e.PhoneNumber == phone);
         }
-        
+
         public List<GetActiveEmpDept> GetActiveEmpDept()
         {
             var result = (from e in context.Employees
@@ -230,7 +211,7 @@ namespace Tugas.Repository
 
         public List<TotalActiveEmp> TotalNonActiveEmp()
         {
-            var result = context.Employees.Where(e => e.IsActive == true).GroupBy(e => e.Department.Name).Select(g => new TotalActiveEmp
+            var result = context.Employees.Where(e => e.IsActive == false).GroupBy(e => e.Department.Name).Select(g => new TotalActiveEmp
             {
                 department = g.Key,
                 total = g.Count()
