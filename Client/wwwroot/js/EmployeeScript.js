@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     // URL data-data utama
-    let masterData = "https://localhost:7140/api/Employees/Employees";
+    let masterData = "https://localhost:7140/api/Employees/Pagging";
 
     // URL data-data karyawan aktif
     let activeData = "https://localhost:7140/api/Employees/GetActiveEmpDept";
@@ -38,9 +38,11 @@
         "info": true,
         "autoWidth": false,
         "responsive": true,
+        "processing": true,
+        "serverSide": true,
         "ajax": {
-            url: "https://localhost:7140/api/Employees/Employees",
-            type: "GET",
+            url: "https://localhost:7140/api/Employees/Pagging",
+            type: "POST",
             "datatype": "json",
             "dataSrc": "data"
         },
@@ -50,7 +52,7 @@
                 "data": null,
                 "orderable": false,
             },
-            { "data": "nik" },
+            { "data": "nik", "name": "NIK" },
             {
                 "data": null,
                 "render": function (data, type, row) {
